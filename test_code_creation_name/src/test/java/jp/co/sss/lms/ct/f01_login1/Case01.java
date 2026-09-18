@@ -39,8 +39,11 @@ public class Case01 {
 	@DisplayName("テスト01 トップページURLでアクセス")
 	void test01() throws InterruptedException, IOException {
 		// TODO ここに追加
+		//		URLを取得
 		webDriver.get("http://localhost:8080/lms/");
+		//		タイトルが一致かどうか確認
 		assertEquals("ログイン | LMS", webDriver.getTitle());
+		//		スクショとる
 		getEvidence(new Object() {
 		}, "テスト01");
 	}
