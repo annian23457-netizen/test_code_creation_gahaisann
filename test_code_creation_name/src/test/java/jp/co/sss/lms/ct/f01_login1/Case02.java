@@ -52,7 +52,7 @@ public class Case02 {
 	@Order(2)
 	@DisplayName("テスト02 DBに登録されていないユーザーでログイン")
 	void test02() {
-		// TODO ここに追加
+		// TODO ここに追加　呉
 		//		ログインIDを取得
 		WebElement loginIdInput = webDriver.findElement(By.id("loginId"));
 		//　　　ログインIDをクリック
