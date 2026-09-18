@@ -1,11 +1,14 @@
 package jp.co.sss.lms.ct.f01_login1;
 
 import static jp.co.sss.lms.ct.util.WebDriverUtils.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -36,13 +39,46 @@ public class Case03 {
 	@DisplayName("テスト01 トップページURLでアクセス")
 	void test01() {
 		// TODO ここに追加
+//		URLを取得
+		webDriver.get("http://localhost:8080/lms/");
+		//		タイトルが一致かどうか確認
+		assertEquals("ログイン | LMS", webDriver.getTitle());
+		//		スクショとる
+		getEvidence(new Object() {
+		}, "テスト03.1");
 	}
+		
+	
 
 	@Test
 	@Order(2)
 	@DisplayName("テスト02 初回ログイン済みの受講生ユーザーでログイン")
 	void test02() {
 		// TODO ここに追加
+//		ログインIDを取得
+		WebElement loginIdInput = webDriver.findElement(By.id("loginId"));
+		//　　　ログインIDをクリック
+		loginIdInput.click();
+		//　　　ログインIDの値を入力
+		loginIdInput.sendKeys("StudentAA01");
+
+		//		パスワードを取得
+		WebElement passwordInput = webDriver.findElement(By.id("password"));
+		//		パスワードをクリック
+		passwordInput.clear();
+		//		パスワードの値を入力
+		passwordInput.sendKeys("Aa123456789");
+		//ボタンをクリック
+		webDriver.findElement(By.className("btn-primary")).click();
+		//		エラーメッセージが一致かどうか確認
+		assertEquals("コース詳細 | LMS",webDriver.getTitle());
+		//		スクショとる
+		getEvidence(new Object() {
+		}, "テスト03.2");
+	}
+		
+		
+		
 	}
 
-}
+
