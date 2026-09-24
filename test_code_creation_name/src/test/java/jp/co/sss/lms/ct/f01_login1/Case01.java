@@ -15,7 +15,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 /**
  * 結合テスト ログイン機能①
- * ケース01
+ * ケース01　呉
  * @author holy
  */
 @TestMethodOrder(OrderAnnotation.class)

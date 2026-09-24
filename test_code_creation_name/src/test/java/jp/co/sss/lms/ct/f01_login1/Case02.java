@@ -15,7 +15,7 @@ import org.openqa.selenium.WebElement;
 
 /**
  * 結合テスト ログイン機能①
- * ケース02
+ * ケース02　呉
  * @author holy
  */
 @TestMethodOrder(OrderAnnotation.class)

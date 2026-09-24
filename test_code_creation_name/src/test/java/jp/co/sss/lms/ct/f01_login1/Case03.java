@@ -7,15 +7,15 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 /**
  * 結合テスト ログイン機能①
- * ケース03
+ * ケース03　呉
  * @author holy
  */
 @TestMethodOrder(OrderAnnotation.class)
@@ -39,23 +39,21 @@ public class Case03 {
 	@DisplayName("テスト01 トップページURLでアクセス")
 	void test01() {
 		// TODO ここに追加
-//		URLを取得
+		//		URLを取得
 		webDriver.get("http://localhost:8080/lms/");
-		//		タイトルが一致かどうか確認
+		//		タイトルが一致か確認
 		assertEquals("ログイン | LMS", webDriver.getTitle());
 		//		スクショとる
 		getEvidence(new Object() {
 		}, "テスト03.1");
 	}
-		
-	
 
 	@Test
 	@Order(2)
 	@DisplayName("テスト02 初回ログイン済みの受講生ユーザーでログイン")
 	void test02() {
 		// TODO ここに追加
-//		ログインIDを取得
+		//		ログインIDを取得
 		WebElement loginIdInput = webDriver.findElement(By.id("loginId"));
 		//　　　ログインIDをクリック
 		loginIdInput.click();
@@ -70,15 +68,11 @@ public class Case03 {
 		passwordInput.sendKeys("Aa123456789");
 		//ボタンをクリック
 		webDriver.findElement(By.className("btn-primary")).click();
-		//		エラーメッセージが一致かどうか確認
-		assertEquals("コース詳細 | LMS",webDriver.getTitle());
+		//		タイトルが一致か確認
+		assertEquals("コース詳細 | LMS", webDriver.getTitle());
 		//		スクショとる
 		getEvidence(new Object() {
 		}, "テスト03.2");
 	}
-		
-		
-		
-	}
 
-
+}
