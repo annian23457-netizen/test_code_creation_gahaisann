@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -146,17 +147,33 @@ public class Case05 {
 	@Order(5)
 	@DisplayName("テスト05 キーワード検索で該当キーワードを含む検索結果だけ表示")
 	void test05() {
-		// TODO ここに追加
 		WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
 
+		// 1. キーワード入力
 		WebElement keyword = wait.until(
 				ExpectedConditions.visibilityOfElementLocated(By.id("form")));
-		keyword.click();
 		keyword.clear();
 		keyword.sendKeys("セルフ・キャリアドック制度とは何か");
 
-		WebElement keywordselect = webDriver.findElement(By.id("btn btn-primary"));
-		keywordselect.click();
+		// 2. submit() で確実にフォーム送信を実行
+		keyword.submit();
+
+		// 検索結果のテーブル行（tr）が描画されるまで待機
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table.sortabletable tbody tr")));
+
+		// 4. 検索結果の <dt> 内にある 2 番目の span（質問文）を取得
+		WebElement questionElement = wait.until(
+				ExpectedConditions.visibilityOfElementLocated(By.cssSelector("dt.mb10 span:nth-child(2)")));
+
+		// 「検索結果」というテキストを持つ th 要素を取得
+		WebElement searchResultHeader = webDriver.findElement(By.xpath("//th[text()='検索結果']"));
+
+		// 画面中央に表示されるようにスクロール
+		((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+				searchResultHeader);
+
+		// 6. テキストの比較（.getText() を呼ぶ）
+		assertEquals("セルフ・キャリアドック制度とは何か", questionElement.getText());
 
 		getEvidence(new Object() {
 		}, "テスト05.5");
@@ -167,6 +184,20 @@ public class Case05 {
 	@DisplayName("テスト06 「クリア」ボタン押下で入力したキーワードを消去")
 	void test06() {
 		// TODO ここに追加
+
+		// 単一のクラス名だけ指定
+		// class="btn btn-primary" かつ value="クリア" の要素を特定
+		WebElement clearButton = webDriver.findElement(By.cssSelector("input.btn.btn-primary[value='クリア']"));
+
+		((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView({block: 'center'});", clearButton);
+		clearButton.click();
+
+		WebElement kuria = webDriver.findElement(By.id("form"));
+		// 空文字 "" であることを検証する
+		assertEquals("", kuria.getAttribute("value"));
+
+		getEvidence(new Object() {
+		}, "テスト05.6");
 	}
 
 }
