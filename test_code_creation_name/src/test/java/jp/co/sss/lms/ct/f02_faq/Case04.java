@@ -4,6 +4,7 @@ import static jp.co.sss.lms.ct.util.WebDriverUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Duration;
+import java.util.Set;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -121,13 +122,11 @@ public class Case04 {
 
 		//　　　新しいタブが開くまで2秒待機し
 		wait.until(ExpectedConditions.numberOfWindowsToBe(2));
-		//		操作対象を新しいタブへ切り替える
-		for (String windowHandle : webDriver.getWindowHandles()) {
-			if (!originalWindow.contentEquals(windowHandle)) {
-				webDriver.switchTo().window(windowHandle);
-				break;
-			}
-		}
+		// 全ハンドルを取得し、元のウィンドウを除外する
+		Set<String> handles = webDriver.getWindowHandles();
+		handles.remove(originalWindow);
+		// 切り替え
+		webDriver.switchTo().window(handles.iterator().next());
 
 		//  　　"よくある質問 | LMS"が見つかるまでに10秒間待機
 		wait.until(ExpectedConditions.titleIs("よくある質問 | LMS"));
