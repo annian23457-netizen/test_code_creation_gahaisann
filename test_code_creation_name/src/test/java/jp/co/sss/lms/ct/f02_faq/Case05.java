@@ -14,10 +14,11 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import jp.co.sss.lms.ct.util.WebDriverUtils;
 
 /**
  * 結合テスト よくある質問機能
@@ -47,7 +48,7 @@ public class Case05 {
 		// TODO ここに追加
 		//		URLを取得
 		webDriver.get("http://localhost:8080/lms/");
-		//		タイトルが一致か確認
+		//		タイトルが一致か検証
 		assertEquals("ログイン | LMS", webDriver.getTitle());
 		//		スクショとる
 		getEvidence(new Object() {
@@ -74,7 +75,7 @@ public class Case05 {
 		passwordInput.sendKeys("Aa123456789");
 		//　　　ボタンをクリック
 		webDriver.findElement(By.className("btn-primary")).click();
-		//		タイトルが一致か確認
+		//		タイトルが一致か検証
 		assertEquals("コース詳細 | LMS", webDriver.getTitle());
 		//		スクショとる
 		getEvidence(new Object() {
@@ -97,7 +98,7 @@ public class Case05 {
 				ExpectedConditions.elementToBeClickable(By.linkText("ヘルプ")));
 		//		"ヘルプ"をクリック
 		helpLink.click();
-		//		タイトルが一致か確認
+		//		タイトルが一致か検証
 		assertEquals("ヘルプ | LMS", webDriver.getTitle());
 		//　　　スクショとる
 		getEvidence(new Object() {
@@ -135,7 +136,7 @@ public class Case05 {
 
 		//  　　"よくある質問 | LMS"が見つかるまでに10秒間待機
 		wait.until(ExpectedConditions.titleIs("よくある質問 | LMS"));
-		//　　　タイトルが一致か確認
+		//　　　タイトルが一致か検証
 		assertEquals("よくある質問 | LMS", webDriver.getTitle());
 
 		// 　　　スクリーンショットを取得
@@ -147,34 +148,35 @@ public class Case05 {
 	@Order(5)
 	@DisplayName("テスト05 キーワード検索で該当キーワードを含む検索結果だけ表示")
 	void test05() {
+		//		　条件が満たされるまで10秒間待機
 		WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
-
-		// 1. キーワード入力
+		// キーワード入力フォームの取得
 		WebElement keyword = wait.until(
 				ExpectedConditions.visibilityOfElementLocated(By.id("form")));
 		keyword.clear();
+		// キーワード入力
 		keyword.sendKeys("セルフ・キャリアドック制度とは何か");
 
-		// 2. submit() で確実にフォーム送信を実行
+		// 確実にフォーム送信を実行
 		keyword.submit();
 
-		// 検索結果のテーブル行（tr）が描画されるまで待機
+		// 検索結果のテーブルが存在されるまで待機
 		wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table.sortabletable tbody tr")));
 
-		// 4. 検索結果の <dt> 内にある 2 番目の span（質問文）を取得
+		// 検索結果の <dt> 内にある 2 番目の spanを取得
 		WebElement questionElement = wait.until(
 				ExpectedConditions.visibilityOfElementLocated(By.cssSelector("dt.mb10 span:nth-child(2)")));
 
-		// 「検索結果」というテキストを持つ th 要素を取得
+		// 検索結果を取得
 		WebElement searchResultHeader = webDriver.findElement(By.xpath("//th[text()='検索結果']"));
 
-		// 画面中央に表示されるようにスクロール
-		((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
-				searchResultHeader);
+		// ヘッダーのY座標を取得してその位置までスクロール
+		String yPosition = String.valueOf(searchResultHeader.getLocation().getY());
+		WebDriverUtils.scrollTo(yPosition);
 
-		// 6. テキストの比較（.getText() を呼ぶ）
+		// 検索結果が一致か検証
 		assertEquals("セルフ・キャリアドック制度とは何か", questionElement.getText());
-
+		// 　　　スクリーンショットを取得
 		getEvidence(new Object() {
 		}, "テスト05.5");
 	}
@@ -184,18 +186,16 @@ public class Case05 {
 	@DisplayName("テスト06 「クリア」ボタン押下で入力したキーワードを消去")
 	void test06() {
 		// TODO ここに追加
-
-		// 単一のクラス名だけ指定
-		// class="btn btn-primary" かつ value="クリア" の要素を特定
+		// クリアボタンの取得
 		WebElement clearButton = webDriver.findElement(By.cssSelector("input.btn.btn-primary[value='クリア']"));
-
-		((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView({block: 'center'});", clearButton);
+		// 画面トップへスクロールしてクリアボタンをクリック
+		WebDriverUtils.scrollTo("0");
 		clearButton.click();
-
+		// フォーム要素の取得
 		WebElement kuria = webDriver.findElement(By.id("form"));
-		// 空文字 "" であることを検証する
+		// 入力欄が空文字になっていることを検証
 		assertEquals("", kuria.getAttribute("value"));
-
+		//	 　　　スクリーンショットを取得
 		getEvidence(new Object() {
 		}, "テスト05.6");
 	}

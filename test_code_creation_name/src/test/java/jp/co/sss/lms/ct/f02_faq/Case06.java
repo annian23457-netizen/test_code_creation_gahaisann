@@ -18,6 +18,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import jp.co.sss.lms.ct.util.WebDriverUtils;
+
 /**
  * 結合テスト よくある質問機能
  * ケース06
@@ -46,7 +48,7 @@ public class Case06 {
 		// TODO ここに追加
 		//		URLを取得
 		webDriver.get("http://localhost:8080/lms/");
-		//		タイトルが一致か確認
+		//		タイトルが一致か検証
 		assertEquals("ログイン | LMS", webDriver.getTitle());
 		//		スクショとる
 		getEvidence(new Object() {
@@ -73,7 +75,7 @@ public class Case06 {
 		passwordInput.sendKeys("Aa123456789");
 		//　　　ボタンをクリック
 		webDriver.findElement(By.className("btn-primary")).click();
-		//		タイトルが一致か確認
+		//		タイトルが一致か検証
 		assertEquals("コース詳細 | LMS", webDriver.getTitle());
 		//		スクショとる
 		getEvidence(new Object() {
@@ -97,7 +99,7 @@ public class Case06 {
 				ExpectedConditions.elementToBeClickable(By.linkText("ヘルプ")));
 		//		"ヘルプ"をクリック
 		helpLink.click();
-		//		タイトルが一致か確認
+		//		タイトルが一致か検証
 		assertEquals("ヘルプ | LMS", webDriver.getTitle());
 		//　　　スクショとる
 		getEvidence(new Object() {
@@ -136,7 +138,7 @@ public class Case06 {
 
 		//  　　"よくある質問 | LMS"が見つかるまでに10秒間待機
 		wait.until(ExpectedConditions.titleIs("よくある質問 | LMS"));
-		//　　　タイトルが一致か確認
+		//　　　タイトルが一致か検証
 		assertEquals("よくある質問 | LMS", webDriver.getTitle());
 
 		// 　　　スクリーンショットを取得
@@ -149,7 +151,25 @@ public class Case06 {
 	@DisplayName("テスト05 カテゴリ検索で該当カテゴリの検索結果だけ表示")
 	void test05() {
 		// TODO ここに追加
-
+		//		　条件が満たされるまで10秒間待機
+		WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
+		// カテゴリ検索エリアの第一リンクを取得してクリック
+		WebElement categoryLink = webDriver.findElement(
+				By.xpath("//fieldset[legend[contains(text(),'カテゴリ検索')]]//ul/li/a"));
+		categoryLink.click();
+		// 検索結果のテーブルが存在されるまで待機
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table.sortabletable tbody tr")));
+		// 検索結果を取得
+		WebElement searchResultHeader = webDriver.findElement(By.xpath("//th[text()='検索結果']"));
+		// ヘッダーのY座標を取得してその位置までスクロール
+		String yPosition = String.valueOf(searchResultHeader.getLocation().getY());
+		WebDriverUtils.scrollTo(yPosition);
+		// URLにカテゴリIDが含まれることを検証
+		wait.until(ExpectedConditions.urlContains("frequentlyAskedQuestionCategoryId="));
+		assertTrue(webDriver.getCurrentUrl().contains("frequentlyAskedQuestionCategoryId="));
+		// スクリーンショットを取得
+		getEvidence(new Object() {
+		}, "テスト06.5");
 	}
 
 	@Test
@@ -157,6 +177,23 @@ public class Case06 {
 	@DisplayName("テスト06 検索結果の質問をクリックしその回答を表示")
 	void test06() {
 		// TODO ここに追加
+		//		　条件が満たされるまで10秒間待機
+		WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
+		// 質問要素が表示されるまで待機してクリック
+		WebElement questionElement = wait.until(
+				ExpectedConditions.visibilityOfElementLocated(By.cssSelector("dt.mb10 span:nth-child(1)")));
+		questionElement.click();
+		// 回答エリアが表示されるまで待機
+		WebElement answerElement = wait.until(
+				ExpectedConditions.visibilityOfElementLocated(By.cssSelector("dd.fs18")));
+		// 回答本文を取得
+		WebElement answerTextElement = answerElement.findElement(By.cssSelector("span:nth-child(2)"));
+		// 回答本文が一致か検証
+		assertEquals(
+				"受講者の退職や解雇等、やむを得ない事情による途中終了に関してなど、事情をお伺いした上で、協議という形を取らせて頂きます。 弊社営業担当までご相談下さい。",
+				answerTextElement.getText().trim());
+		// スクリーンショットを取得
+		getEvidence(new Object() {
+		}, "テスト06.6");
 	}
-
 }
