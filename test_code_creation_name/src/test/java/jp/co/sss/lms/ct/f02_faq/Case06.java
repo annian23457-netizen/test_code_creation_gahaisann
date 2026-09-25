@@ -164,9 +164,11 @@ public class Case06 {
 		// ヘッダーのY座標を取得してその位置までスクロール
 		String yPosition = String.valueOf(searchResultHeader.getLocation().getY());
 		WebDriverUtils.scrollTo(yPosition);
-		// URLにカテゴリIDが含まれることを検証
-		wait.until(ExpectedConditions.urlContains("frequentlyAskedQuestionCategoryId="));
-		assertTrue(webDriver.getCurrentUrl().contains("frequentlyAskedQuestionCategoryId="));
+		//質問要素を取得
+		WebElement questionElement = wait.until(
+				ExpectedConditions.visibilityOfElementLocated(By.cssSelector("dt.mb10 span:nth-child(2)")));
+		//		部分一致か検証
+		assertTrue(questionElement.getText().contains("キャンセル料"));
 		// スクリーンショットを取得
 		getEvidence(new Object() {
 		}, "テスト06.5");
