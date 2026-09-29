@@ -1,6 +1,9 @@
 package jp.co.sss.lms.ct.f03_report;
 
 import static jp.co.sss.lms.ct.util.WebDriverUtils.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.Duration;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -9,6 +12,11 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * 結合テスト レポート機能
@@ -36,6 +44,13 @@ public class Case09 {
 	@DisplayName("テスト01 トップページURLでアクセス")
 	void test01() {
 		// TODO ここに追加
+		//		URLを取得
+		webDriver.get("http://localhost:8080/lms/");
+		//		タイトルが一致か検証
+		assertEquals("ログイン | LMS", webDriver.getTitle());
+		//		スクショとる
+		getEvidence(new Object() {
+		}, "テスト09.1");
 	}
 
 	@Test
@@ -43,6 +58,26 @@ public class Case09 {
 	@DisplayName("テスト02 初回ログイン済みの受講生ユーザーでログイン")
 	void test02() {
 		// TODO ここに追加
+		//		ログインIDを取得
+		WebElement loginIdInput = webDriver.findElement(By.id("loginId"));
+		//　　　ログインIDをクリック
+		loginIdInput.click();
+		//　　　ログインIDの値を入力
+		loginIdInput.sendKeys("StudentAA01");
+
+		//		パスワードを取得
+		WebElement passwordInput = webDriver.findElement(By.id("password"));
+		//		パスワードをクリック
+		passwordInput.clear();
+		//		パスワードの値を入力
+		passwordInput.sendKeys("Aa123456789");
+		//　　　ボタンをクリック
+		webDriver.findElement(By.className("btn-primary")).click();
+		//		タイトルが一致か検証
+		assertEquals("コース詳細 | LMS", webDriver.getTitle());
+		//		スクショとる
+		getEvidence(new Object() {
+		}, "テスト09.2");
 	}
 
 	@Test
@@ -50,6 +85,16 @@ public class Case09 {
 	@DisplayName("テスト03 上部メニューの「ようこそ○○さん」リンクからユーザー詳細画面に遷移")
 	void test03() {
 		// TODO ここに追加
+		//		条件が満たされるまで10秒間待機
+		//		"ヘルプ"が見つかるまでに10秒間待機
+		WebElement welcomElement = webDriver.findElement(By.partialLinkText("ようこそ"));
+		//		"ヘルプ"をクリック
+		welcomElement.click();
+		//		タイトルが一致か検証
+		assertEquals("ユーザー詳細", webDriver.getTitle());
+		//　　　スクショとる
+		getEvidence(new Object() {
+		}, "テスト09.3");
 	}
 
 	@Test
@@ -57,6 +102,20 @@ public class Case09 {
 	@DisplayName("テスト04 該当レポートの「修正する」ボタンを押下しレポート登録画面に遷移")
 	void test04() {
 		// TODO ここに追加
+		scrollBy("800");
+		WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
+		// 1. 「レポート」テーブル内の「週報」の行にある「詳細」ボタンをピンポイントで指定
+		// (formのactionが /report/detail になっているものを明示)
+		By detailButtonLocator = By
+				.xpath("//h3[contains(text(),'レポート')]/following::table//tr[contains(., '週報')]//input[@value='修正する']");
+		WebElement detailButton = wait.until(ExpectedConditions.presenceOfElementLocated(detailButtonLocator));
+
+		// 2. JavaScriptで確実にクリック
+		((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", detailButton);
+		assertEquals("レポート登録 | LMS", webDriver.getTitle());
+		getEvidence(new Object() {
+		}, "テスト09.4");
+
 	}
 
 	@Test
@@ -64,6 +123,22 @@ public class Case09 {
 	@DisplayName("テスト05 報告内容を修正して「提出する」ボタンを押下しエラー表示：学習項目が未入力")
 	void test05() {
 		// TODO ここに追加
+		WebElement inputText = webDriver.findElement(By.id("content_2"));
+		inputText.clear();
+		inputText.sendKeys("報告内容を修正しました。");
+		WebElement submitbutton = webDriver.findElement(By.cssSelector("button[type='submit']"));
+		scrollBy("400");
+		submitbutton.click();
+		scrollBy("400");
+		//		 String evidenceTitle = "レポート登録 | LMS";
+		//			assertEquals(evidenceTitle, webDriver.getTitle());
+
+		//エラー出力エビデンス取得
+		WebElement intFieldName = webDriver.findElement(By.id("intFieldName_0"));
+		assertTrue(intFieldName.getAttribute("class").contains("errorInput"));
+
+		getEvidence(new Object() {
+		}, "テスト09.5");
 	}
 
 	@Test
