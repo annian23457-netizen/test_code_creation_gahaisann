@@ -80,14 +80,17 @@ public class Case07 {
 	@Order(3)
 	@DisplayName("テスト03 未提出の研修日の「詳細」ボタンを押下しセクション詳細画面に遷移")
 	void test03() {
-		// TODO ここに追加
-		//未提出の文字列を含む行の中にある「詳細」ボタンを取得してクリック
+		// 未提出の行にある「詳細」ボタンを取得
 		WebElement detailButton = webDriver.findElement(
 				By.xpath("//tr[td/span[text()='未提出']]//input[@value='詳細']"));
 
 		// JavaScriptで物理クリックの干渉を無視して直接クリック
 		((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", detailButton);
+
+		// タイトルが一致か検証
 		assertEquals("セクション詳細 | LMS", webDriver.getTitle());
+
+		// スクショとる
 		getEvidence(new Object() {
 		}, "テスト07.3");
 	}
@@ -96,11 +99,16 @@ public class Case07 {
 	@Order(4)
 	@DisplayName("テスト04 「提出する」ボタンを押下しレポート登録画面に遷移")
 	void test04() {
-		// TODO ここに追加
+		// 「〜を提出する」ボタンを取得
+		WebElement submitButton = webDriver.findElement(By.cssSelector("input[value*='を提出する']"));
 
-		WebElement passwordInput = webDriver.findElement(By.cssSelector("input[value*='を提出する']"));
-		passwordInput.click();
+		// ボタンをクリック
+		submitButton.click();
+
+		// タイトルが一致か検証
 		assertEquals("レポート登録 | LMS", webDriver.getTitle());
+
+		// スクショとる
 		getEvidence(new Object() {
 		}, "テスト07.4");
 	}
@@ -109,16 +117,25 @@ public class Case07 {
 	@Order(5)
 	@DisplayName("テスト05 報告内容を入力して「提出する」ボタンを押下し確認ボタン名が更新される")
 	void test05() {
-		// TODO ここに追加
+		// 報告内容の入力エリアを取得
 		WebElement inputText = webDriver.findElement(By.id("content_0"));
+
+		// 入力エリアをクリア
 		inputText.clear();
+
+		// 報告内容の値を入力
 		inputText.sendKeys("本日の研修内容です。");
-		WebElement submitbutton = webDriver.findElement(By.cssSelector("button[type='submit']"));
-		submitbutton.click();
+
+		// 「提出する」ボタンを取得してクリック
+		WebElement submitButton = webDriver.findElement(By.cssSelector("button[type='submit']"));
+		submitButton.click();
+
+		// 「提出済み」ボタンが表示されているか検証
 		boolean evidenceConfirmButton = webDriver.findElement(By.cssSelector("input[value*='提出済み']")).isDisplayed();
 		assertTrue(evidenceConfirmButton);
+
+		// スクショとる
 		getEvidence(new Object() {
 		}, "テスト07.5");
 	}
-
 }

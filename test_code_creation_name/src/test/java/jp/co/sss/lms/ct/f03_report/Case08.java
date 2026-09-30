@@ -85,14 +85,20 @@ public class Case08 {
 	@Order(3)
 	@DisplayName("テスト03 提出済の研修日の「詳細」ボタンを押下しセクション詳細画面に遷移")
 	void test03() {
-		// TODO ここに追加
-		//未提出の文字列を含む行の中にある「詳細」ボタンを取得してクリック
+		// 提出済みの行にある「詳細」ボタン一覧を取得
 		List<WebElement> detailButtons = webDriver.findElements(
 				By.xpath("//tr[td/span[text()='提出済み']]//input[@value='詳細']"));
+
+		// 2番目の「詳細」ボタンを取得
 		WebElement detailButton = detailButtons.get(1);
+
 		// JavaScriptで物理クリックの干渉を無視して直接クリック
 		((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", detailButton);
+
+		// タイトルが一致か検証
 		assertEquals("セクション詳細 | LMS", webDriver.getTitle());
+
+		// スクショとる
 		getEvidence(new Object() {
 		}, "テスト08.3");
 	}
@@ -101,29 +107,49 @@ public class Case08 {
 	@Order(4)
 	@DisplayName("テスト04 「確認する」ボタンを押下しレポート登録画面に遷移")
 	void test04() {
-		// TODO ここに追加
-
+		// 画面をスクロール
 		scrollBy("400");
+
+		// 「提出済み週報【デモ】を確認する」ボタンを取得してクリック
 		webDriver.findElement(By.cssSelector("input[value*='提出済み週報【デモ】を確認する']")).click();
+
+		// 送信ボタンが表示されるまで待機
 		visibilityTimeout(By.cssSelector("button[type='submit']"), 5);
+
+		// タイトルが一致か検証
 		assertEquals("レポート登録 | LMS", webDriver.getTitle());
+
+		// スクショとる
 		getEvidence(new Object() {
 		}, "テスト08.4");
-
 	}
 
 	@Test
 	@Order(5)
 	@DisplayName("テスト05 報告内容を修正して「提出する」ボタンを押下しセクション詳細画面に遷移")
 	void test05() {
-		// TODO ここに追加
+		// 報告内容の入力エリアを取得
 		WebElement inputText = webDriver.findElement(By.id("content_1"));
+
+		// 入力エリアをクリア
 		inputText.clear();
+
+		// 修正後の報告内容を入力
 		inputText.sendKeys("報告内容を修正しました。");
+
+		// 「提出する」ボタンを取得
 		WebElement submitbutton = webDriver.findElement(By.cssSelector("button[type='submit']"));
+
+		// 画面をスクロール
 		scrollBy("400");
+
+		// ボタンをクリック
 		submitbutton.click();
+
+		// タイトルが一致か検証
 		assertEquals("セクション詳細 | LMS", webDriver.getTitle());
+
+		// スクショとる
 		getEvidence(new Object() {
 		}, "テスト08.5");
 	}
@@ -132,14 +158,16 @@ public class Case08 {
 	@Order(6)
 	@DisplayName("テスト06 上部メニューの「ようこそ○○さん」リンクからユーザー詳細画面に遷移")
 	void test06() {
-		// TODO ここに追加
-		//		条件が満たされるまで10秒間待機
+		// 「ようこそ」を含むリンク要素を取得
 		WebElement welcomElement = webDriver.findElement(By.partialLinkText("ようこそ"));
-		//		クリック
+
+		// リンクをクリック
 		welcomElement.click();
-		//		タイトルが一致か検証
+
+		// タイトルが一致か検証
 		assertEquals("ユーザー詳細", webDriver.getTitle());
-		//　　　スクショとる
+
+		// スクショとる
 		getEvidence(new Object() {
 		}, "テスト08.6");
 	}
@@ -148,8 +176,13 @@ public class Case08 {
 	@Order(7)
 	@DisplayName("テスト07 該当レポートの「詳細」ボタンを押下しレポート詳細画面で修正内容が反映される")
 	void test07() {
+		// 画面をスクロール
 		scrollBy("400");
+
+		// 明示的待機オブジェクトの生成（最大10秒）
 		WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
+
+		// 週報のレポート行にある「詳細」ボタンのロケータ定義
 		By detailButtonLocator = By.xpath(
 				"//h3[text()='レポート']/following-sibling::table//tr[td[contains(text(),'週報')]]//form[contains(@action,'/report/detail')]//input[@value='詳細']");
 
@@ -158,13 +191,16 @@ public class Case08 {
 
 		// JavaScriptで確実にクリック
 		((JavascriptExecutor) webDriver).executeScript("arguments[0].click();", detailButton);
+
+		// 画面をスクロール
 		scrollBy("400");
-		// 画面遷移後の要素が表示されるまで待機
+
+		// 所感項目の値を取得してテキストを検証
 		By impressionTd = By.xpath("//th[contains(text(),'所感')]/following-sibling::td");
 		String actualImpressionTd = webDriver.findElement(impressionTd).getText().trim();
 		assertEquals("報告内容を修正しました。", actualImpressionTd);
 
-		// エビデンス取得
+		// スクショとる
 		getEvidence(new Object() {
 		}, "テスト08.7");
 	}
